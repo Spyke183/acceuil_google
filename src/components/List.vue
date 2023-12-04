@@ -3,7 +3,8 @@
   <div class="favoris">
     <div v-for="contact in contacts" :key="contact.id" class="container">
       <div class="Affichage">
-        <div class="modif" @click="openModal(contact)">+</div>
+        <!-- Bouton pour ouvrir le menu d'actions -->
+        <div class="modif" @click="selectedContact = contact">+</div>
         <div class="card_logo">
           <div class="logo">
             <img :src="contact.fields.Image" alt="Image du contact" />
@@ -12,27 +13,27 @@
         <div class="nom">
           {{ contact.fields.Nom }} {{ contact.fields.Prenom }}
         </div>
+        <!-- Menu d'actions -->
+        <div class="action-menu" v-if="selectedContact === contact">
+          <button class="action-item" @click="handleUpdate(contact)">Modifier le raccourci</button>
+          <button class="action-item" @click="deleteContact(contact.id)">Supprimer</button>
+        </div>
       </div>
     </div>
   </div>
 
-  <label for="nom">Nom</label>
-  <input type="text" name="nom" id="nom" v-model="nom" />
-  <label for="prenom">Prénom</label>
-  <input type="text" name="prenom" id="prenom" v-model="prenom" />
-  <label for="email">Email</label>
-  <input type="email" name="email" id="email" v-model="email" />
-  <button v-if="edit" @click="updateContact(selectedId)">Modifier</button>
-  <button v-if="edit" @click="edit = false">Annuler</button>
-  <button v-else @click="createContact">Créer un contact</button>
-
-  <div class="modal" v-if="showModal">
-    <div class="modal-content">
-      <button @click="handleUpdate(selectedContact)">Modifier</button>
-      <button @click="deleteContact(selectedContact.id)">Supprimer</button>
-      <button @click="closeModal">Fermer</button>
-    </div>
+  <!-- Formulaire pour modifier ou créer un contact -->
+  <div v-if="edit" class="contact-form">
+    <label for="nom">Nom</label>
+    <input type="text" name="nom" id="nom" v-model="nom" />
+    <label for="prenom">Prénom</label>
+    <input type="text" name="prenom" id="prenom" v-model="prenom" />
+    <label for="email">Email</label>
+    <input type="email" name="email" id="email" v-model="email" />
+    <button @click="updateContact(selectedId)">Modifier</button>
+    <button @click="edit = false">Annuler</button>
   </div>
+  <button v-else @click="createContact">Créer un contact</button>
 </template>
 
 <script>
@@ -61,6 +62,9 @@ export default {
       this.prenom = "";
       this.email = "";
       this.image = "";
+    },
+    openMenu(contact) {
+      this.selectedContact = contact;
     },
     getContacts() {
       fetch(
@@ -156,14 +160,25 @@ export default {
     closeModal() {
       this.showModal = false;
     },
+    closeActionMenu(event) {
+      // Vérifie si le clic s'est produit en dehors du menu d'actions
+      if (this.selectedContact && (!event.target.closest('.action-menu') && !event.target.closest('.modif'))) {
+        this.selectedContact = null;
+      }
+    },
   },
   mounted() {
     this.getContacts();
+    window.addEventListener('click', this.closeActionMenu);
   },
   watch: {
     edit() {
       this.getContacts();
     },
+    beforeDestroy() {
+    // Assurez-vous de nettoyer l'écouteur d'événements lorsque le composant est détruit
+    window.removeEventListener('click', this.closeActionMenu);
+  },
   },
 };
 </script>
@@ -190,7 +205,6 @@ export default {
   overflow: hidden;
   height: calc(var(--icon-size) + 16px);
   width: calc(var(--icon-size) + 16px);
-  margin-top: 16px;
 }
 
 .logo {
@@ -207,22 +221,26 @@ export default {
   border-radius: 50%;
 }
 
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.24);
+.action-menu {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
+    flex-direction: column;
+  position: absolute;
+  background-color: #000000;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  border-radius: 4px;
+  z-index: 10;
 }
 
-.modal-content {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
+.action-item {
+  display: block;
+  padding: 10px;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.3s;
+  background-color: #d1d1d1;
+}
+
+.action-item:hover {
+  background-color: #a3a3a3;
 }
 </style>
