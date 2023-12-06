@@ -217,7 +217,7 @@
     })
     .then(response => response.json())
     .then(data => {
-    this.getFavoris();  // Cette méthode doit recharger les favoris depuis l'API
+    this.getFavoris();  
     this.showModal = false;
   })
     .catch(error => {
@@ -230,7 +230,6 @@
     this.showModal = true;
   },
       createFavori() {
-        // Logique pour la création de Favori, limitée à 10
         if (this.Favoris.length < 10) {
           fetch(`https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}`, {
             headers: {
@@ -268,7 +267,6 @@
         this.showModal = false;
       },
       closeActionMenu(event) {
-        // Vérifie si le clic s'est produit en dehors du menu d'actions
     if (this.selectedFavori && (!event.target.closest('.action-menu') && !event.target.closest('.modif'))) {
       this.selectedFavori = null;
         }
@@ -281,13 +279,11 @@
         this.showCreateModal = false;
       },
       createNewFavori() {
-      // Vérification des données du nouveau Favori
       if (!this.newFavori.Nom || !this.newFavori.Lien) {
         alert("Veuillez remplir tous les champs requis.");
         return;
       }
   
-      // Préparation de la requête POST
       const newFavoriData = {
         fields: {
           Nom: this.newFavori.Nom,
@@ -296,7 +292,6 @@
         }
       };
   
-      // Envoi de la requête à l'API
       fetch(`https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}`, {
         headers: {
           Authorization: `Bearer ${API_TOKEN}`,
@@ -307,11 +302,8 @@
       })
       .then(response => response.json())
       .then(data => {
-        // Ajout du nouveau Favori à la liste des Favoris
         this.Favoris.push(data.record);
-        // Réinitialisation des champs du formulaire
         this.newFavori = { Nom: '', Lien: '', Image: '' };
-        // Fermeture du modal
         this.showCreateModal = false;
         window.location.reload();
 
@@ -332,7 +324,6 @@
         this.getFavoris();
       },
       beforeDestroy() {
-      // Assurez-vous de nettoyer l'écouteur d'événements lorsque le composant est détruit
       window.removeEventListener('click', this.closeActionMenu);
     },
     },
