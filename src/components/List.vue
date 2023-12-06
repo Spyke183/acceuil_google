@@ -1,14 +1,14 @@
 <template>
   <div class="Title">
     <span>G</span><span>o</span><span>o</span><span>g</span><span>l</span><span>e</span>
-  
   </div>
-  <div class="btn-fav">  <button @click="openCreateModal">Créer un favori</button>
+  <div class="btn-fav">
+    <button @click="openCreateModal">Créer un favori</button>
   </div>
-    <div class="favoris">
+  <div class="favoris">
     <div v-for="favori in displayedFavoris" :key="favori.id" class="container">
       <div class="Affichage">
-        <button class="modif" @click="selectedFavori = favori">Modifier</button>
+        <button class="modif" @click="handleUpdate(favori)">Modifier</button>
         <div class="link">
           <a :href="favori.fields.Lien" target="_blank">
             <div class="card_logo">
@@ -25,7 +25,6 @@
           <div class="close-button" @click="selectedFavori = null">✖</div>
           <button class="action-item" @click="handleUpdate(favori)">Modifier le raccourci</button>
           <button class="action-item" @click="deleteFavori(favori.id)">Supprimer</button>
-
         </div>
       </div>
     </div>
@@ -33,7 +32,7 @@
   <div class="favoris2" v-if="additionalFavoris.length">
     <div v-for="favori in additionalFavoris" :key="favori.id" class="container">
       <div class="Affichage">
-        <button class="modif" @click="selectedFavori = favori">Modifier</button>
+        <button class="modif" @click="handleUpdate(favori)">Modifier</button>
         <div class="link">
           <a :href="favori.fields.Lien" target="_blank">
             <div class="card_logo">
@@ -48,18 +47,14 @@
         </div>
         <div class="action-menu" v-if="selectedFavori === favori">
           <div class="close-button" @click="selectedFavori = null">✖</div>
-
           <button class="action-item" @click="handleUpdate(favori)">Modifier le raccourci</button>
           <button class="action-item" @click="deleteFavori(favori.id)">Supprimer</button>
-
         </div>
       </div>
     </div>
   </div>
-  
-    <form @submit.prevent="updateFavori(selectedId)">
-      <!-- Modale pour la modification des Favoris -->
-      <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
+  <form @submit.prevent="updateFavori(selectedId)">
+    <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
       <div class="modal-content">
         <h3>Modifier le raccourci</h3>
         <form @submit.prevent="updateFavori(selectedId)">
@@ -77,9 +72,8 @@
           </div>
         </form>
       </div>
-    </div></form>
-  
-  <!-- Modal pour la création d'un nouveau Favori -->
+    </div>
+  </form>
   <div v-if="showCreateModal" class="modal-overlay" @click.self="closeCreateModal">
     <div class="modal-content">
       <h3>Créer un nouveau favori</h3>
@@ -103,21 +97,20 @@
       </form>
     </div>
   </div>
-    <!-- Bouton pour ouvrir le menu de personnalisation -->
-    <div class="customization-menu">
-      <button @click="toggleCustomizationMenu">Personnaliser</button>
-      <div v-if="showCustomizationMenu" class="menu">
-        <div class="color-picker">
-          <label for="bg-color">Couleur de fond:</label>
-          <input type="color" id="bg-color" v-model="backgroundColor" @change="changeBackgroundColor">
-        </div>
-        <div class="image-picker">
-          <label for="bg-image">Image de fond (URL):</label>
-          <input type="text" id="bg-image" v-model="backgroundImage" @change="changeBackgroundImage">
-        </div>
+  <div class="customization-menu">
+    <button @click="toggleCustomizationMenu">Personnaliser</button>
+    <div v-if="showCustomizationMenu" class="menu">
+      <div class="color-picker">
+        <label for="bg-color">Couleur de fond:</label>
+        <input type="color" id="bg-color" v-model="backgroundColor" @change="changeBackgroundColor">
+      </div>
+      <div class="image-picker">
+        <label for="bg-image">Image de fond (URL):</label>
+        <input type="text" id="bg-image" v-model="backgroundImage" @change="changeBackgroundImage">
       </div>
     </div>
-  </template>
+  </div>
+</template>
   
   <script>
   const BASE_ID = import.meta.env.VITE_BASE_ID;
